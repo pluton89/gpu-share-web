@@ -27,7 +27,6 @@
         const SERVER_API_URL = "https://serveur-gpu.onrender.com/api";
         const SERVER_WS_URL = "wss://serveur-gpu.onrender.com/ws/worker/";
 
-        // Base de données complète des cartes graphiques avec puissance et gains estimés
         const GPU_DATABASE = [
           { name: 'NVIDIA RTX 4090', hashrate: 135, power: 320, estDailyEarning: 4.85 },
           { name: 'NVIDIA RTX 4080', hashrate: 98, power: 240, estDailyEarning: 3.40 },
@@ -61,14 +60,11 @@
           const [password, setPassword] = useState('');
           const [country, setCountry] = useState('FR');
           const [authError, setAuthError] = useState('');
-          
-          // Nombre total de comptes créés récupéré depuis le serveur
           const [totalAccountsCount, setTotalAccountsCount] = useState(0);
 
           const [chatBannedUntil, setChatBannedUntil] = useState(null);
           const [chatWarning, setChatWarning] = useState('');
 
-          // Calculateur (avec kWh France par défaut à 0.25€)
           const [selectedGPU, setSelectedGPU] = useState(GPU_DATABASE[0]);
           const [elecCost, setElecCost] = useState(0.25);
 
@@ -92,7 +88,6 @@
           const [newMessage, setNewMessage] = useState('');
           const chatEndRef = useRef(null);
 
-          // Récupérer le nombre de comptes créés depuis le serveur
           useEffect(() => {
             fetch(`${SERVER_API_URL}/stats`)
               .then(res => res.json())
@@ -244,12 +239,11 @@
             chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, [chatMessages]);
 
-          // Calculs financiers (Brut - Électricité France - 2% de frais de contribution plateforme)
           const dailyGross = selectedGPU.estDailyEarning;
           const dailyKwh = (selectedGPU.power * 24) / 1000;
           const dailyElecCost = dailyKwh * elecCost;
           const dailyNetBeforeFee = Math.max(0, dailyGross - dailyElecCost);
-          const platformFee = dailyNetBeforeFee * 0.02; // Frais de contribution 2%
+          const platformFee = dailyNetBeforeFee * 0.02;
           const dailyNet = dailyNetBeforeFee - platformFee;
           const monthlyNet = dailyNet * 30;
 
@@ -294,7 +288,6 @@
               <main className="flex-1 max-w-5xl mx-auto w-full p-6 space-y-8">
                 {activeTab === 'home' && (
                   <div className="py-8 space-y-12">
-                    {/* Bannière Principale */}
                     <div className="text-center space-y-6 bg-gradient-to-b from-blue-950/50 via-slate-900/60 to-slate-900/80 border border-slate-800 p-8 md:p-14 rounded-3xl shadow-2xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
                       <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs px-3.5 py-1.5 rounded-full font-semibold uppercase tracking-wider">⚡ Plateforme de Minage Distribué v2.5</span>
@@ -309,40 +302,6 @@
                         <a href="https://discord.gg/votre-invite-discord" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-2xl shadow-xl shadow-[#5865F2]/20 transition flex items-center gap-2">
                           <span>Rejoindre notre Discord</span>
                         </a>
-                      </div>
-                    </div>
-
-                    {/* Grille de Détails / Avantages */}
-                    <div className="grid md:grid-cols-3 gap-6">
-                      <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition">
-                        <div className="w-10 h-10 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center font-bold text-lg">📈</div>
-                        <h3 className="text-white font-bold text-base">Comptes & Communauté</h3>
-                        <p className="text-slate-400 text-xs leading-relaxed">Déjà <strong className="text-white">{totalAccountsCount} membres</strong> inscrits sur la plateforme. Partagez vos astuces sur nos chats régionaux.</p>
-                      </div>
-                      <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition">
-                        <div className="w-10 h-10 bg-emerald-600/20 text-emerald-400 rounded-xl flex items-center justify-center font-bold text-lg">🛡️</div>
-                        <h3 className="text-white font-bold text-base">Sécurité Matérielle</h3>
-                        <p className="text-slate-400 text-xs leading-relaxed">Protection thermique intégrée : l'application régule automatiquement la charge pour préserver la durée de vie de votre GPU.</p>
-                      </div>
-                      <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition">
-                        <div className="w-10 h-10 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center font-bold text-lg">💎</div>
-                        <h3 className="text-white font-bold text-base">Paiements Flexibles</h3>
-                        <p className="text-slate-400 text-xs leading-relaxed">Retirez vos gains dès 10€ accumulés directement vers votre portefeuille en Bitcoin (BTC), Ethereum (ETH) ou BNB.</p>
-                      </div>
-                    </div>
-
-                    {/* Section FAQ / Informations complémentaires pour remplir le site */}
-                    <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-3xl space-y-6">
-                      <h3 className="text-xl font-bold text-white text-center">Foire Aux Questions (FAQ)</h3>
-                      <div className="grid md:grid-cols-2 gap-6 text-xs text-slate-300">
-                        <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-2">
-                          <h4 className="font-bold text-white text-sm">Comment débuter le minage ?</h4>
-                          <p className="leading-relaxed">Téléchargez l'application `.exe`, créez votre compte sur le site web, puis entrez vos identifiants dans l'application pour lier votre GPU en temps réel.</p>
-                        </div>
-                        <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-2">
-                          <h4 className="font-bold text-white text-sm">Quels sont les frais de la plateforme ?</h4>
-                          <p className="leading-relaxed">GPU-Share prélève une contribution transparente de <strong>2%</strong> sur les gains nets après déduction des coûts d'électricité pour assurer la maintenance des serveurs.</p>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -366,33 +325,15 @@
                         <div>
                           <label className="text-xs text-slate-400 block mb-2 font-semibold">Coût de l'électricité (€ / kWh)</label>
                           <input type="number" step="0.01" value={elecCost} onChange={(e) => setElecCost(parseFloat(e.target.value) || 0)} className="w-full bg-slate-950 text-white p-3.5 rounded-xl border border-slate-800 text-sm focus:outline-none focus:border-blue-500" />
-                          <span className="text-[10px] text-slate-500 mt-1 block">Moyenne France estimée : ~0.25 € / kWh</span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
-                        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                          <div className="text-xs text-slate-400">Consommation</div>
-                          <div className="text-lg font-bold text-white mt-1">{selectedGPU.power} W</div>
-                        </div>
-                        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                          <div className="text-xs text-slate-400">Coût électricité /jour</div>
-                          <div className="text-lg font-bold text-rose-400 mt-1">€{dailyElecCost.toFixed(2)}</div>
-                        </div>
-                        <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 col-span-2 md:col-span-1">
-                          <div className="text-xs text-slate-400">Frais plateforme (2%)</div>
-                          <div className="text-lg font-bold text-amber-400 mt-1">€{platformFee.toFixed(2)} /j</div>
                         </div>
                       </div>
 
                       <div className="bg-gradient-to-r from-blue-950/60 to-slate-950 p-6 rounded-2xl border border-blue-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div>
                           <div className="text-xs font-bold text-blue-400 uppercase tracking-wider">Bénéfice Net Estimé</div>
-                          <div className="text-xs text-slate-400 mt-0.5">Après électricité et frais de contribution (2%)</div>
                         </div>
                         <div className="text-right">
                           <div className="text-3xl font-extrabold text-emerald-400">€{monthlyNet.toFixed(2)} <span className="text-xs text-slate-400 font-normal">/ mois</span></div>
-                          <div className="text-xs text-blue-300 font-medium"> (€{dailyNet.toFixed(2)} / jour)</div>
                         </div>
                       </div>
                     </div>
@@ -405,19 +346,10 @@
                       <Download className="w-16 h-16 text-blue-400 mx-auto" />
                       <div className="space-y-2">
                         <h2 className="text-2xl font-bold text-white">Application Client Windows (.exe)</h2>
-                        <p className="text-xs text-slate-400 max-w-sm mx-auto">Téléchargez le fichier d'installation officiel et connectez votre GPU en 1 clic avec votre clé API.</p>
+                        <p className="text-xs text-slate-400 max-w-sm mx-auto">Téléchargez le fichier d'installation officiel et connectez votre GPU en 1 clic.</p>
                       </div>
-                      <a href="https://github.com/pluton89/gpu-miner-releases/raw/refs/heads/main/client_gui.exe" download className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/30 transition">Télécharger Setup-GPU-Share-Miner.exe</a>
-                    </div>
-
-                    <div className="bg-amber-950/20 border border-amber-800/50 p-5 rounded-2xl flex gap-4 items-start">
-                      <ShieldAlert className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <h4 className="text-amber-300 font-bold text-sm">Note concernant Windows Defender</h4>
-                        <p className="text-xs text-slate-300 leading-relaxed">
-                          Les logiciels de minage déclenchent parfois un faux positif antivirus. Cliquez sur <em>"Informations complémentaires"</em> puis <em>"Exécuter quand même"</em> pour lancer l'application en toute sécurité.
-                        </p>
-                      </div>
+                      <!-- Lien corrigé avec raw.githubusercontent.com -->
+                      <a href="https://raw.githubusercontent.com/pluton89/gpu-miner-releases/main/client_gui.exe" download className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/30 transition">Télécharger client_gui.exe</a>
                     </div>
                   </div>
                 )}
@@ -427,7 +359,6 @@
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-800">
                       <div>
                         <h2 className="text-lg font-bold text-white">💬 Chat Communautaire Global</h2>
-                        <p className="text-xs text-slate-400">Discutez en direct avec les autres membres par région. Modération automatique active (Ban 24h en cas d'insultes).</p>
                       </div>
                       <div className="flex gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
                         <button onClick={() => setChatChannel('FR')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${chatChannel === 'FR' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}>🇫🇷 Français</button>
@@ -482,13 +413,6 @@
                         <div className="text-3xl font-extrabold text-blue-400 mt-1">€{balance.toFixed(2)}</div>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow"><div className="text-xs text-slate-400">Hashrate</div><div className="text-xl font-extrabold text-white mt-1">{currentHashrate} MH/s</div></div>
-                      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow"><div className="text-xs text-slate-400">Température</div><div className="text-xl font-extrabold text-white mt-1">{currentTemp}°C</div></div>
-                      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow"><div className="text-xs text-slate-400">Puissance</div><div className="text-xl font-extrabold text-white mt-1">{currentPower} W</div></div>
-                      <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow"><div className="text-xs text-slate-400">Ventilateur</div><div className="text-xl font-extrabold text-white mt-1">{fanSpeed}%</div></div>
-                    </div>
                   </div>
                 )}
 
@@ -496,7 +420,6 @@
                   <div className="space-y-6 max-w-md mx-auto">
                     <div className="text-center space-y-1">
                       <h2 className="text-2xl font-bold text-white">Demande de Retrait</h2>
-                      <p className="text-xs text-slate-400">Seuil minimum : 10.00 €</p>
                     </div>
                     <form onSubmit={handleWithdrawalSubmit} className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-4 shadow-2xl">
                       <div>
